@@ -2,15 +2,20 @@
  * This utility converts RigKontrol3 Input Events to ALSA MIDI events.
  *
  * The RigKontrol3 sends key events (from the snd_usb_caiaq ALSA module).  This
- * utility grabs the events so they don't go anywhere else and sends them as
- * MIDI events thru an ALSA sequencer port.  The expression pedal is capable of
- * sending values with more detail than the range of 0...127.  Output is
- * converted to the range of 0...127 by default, set the HIGHRES setting to
- * change that.
+ * utility runs as a daemon to grab the events so they don't go anywhere else
+ * and sends them as MIDI events thru an ALSA sequencer port.  The expression
+ * pedal is capable of sending values with more detail than the range of
+ * 0...127.  Output is converted to the range of 0...127 by default, set the
+ * HIGHRES setting to change that.
+ *
  *
  * AUTHOR: Xendarboh <xendarboh@gmail.com>
- * DATE: 2012-12-15 20:40:39
- * REFERENCE: http://permalink.gmane.org/gmane.linux.audio.devel/18481
+ * SOURCE: https://code.google.com/p/rigkontrol3-linux-midicontroller/
+ * BIRTHDATE: 2012-12-15 20:40:39
+ * References:
+ *	http://permalink.gmane.org/gmane.linux.audio.devel/18481
+ *	http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+ *	http://www.itp.uzh.ch/~dpotter/howto/daemonize
 */
 
 
@@ -46,8 +51,44 @@
  * higher values than the standard coarse range of 0...127 */
 #define HIGHRES 0
 
-/* Reference: http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio */
 #define convertRange(oldMin, oldMax, newMin, newMax, oldVal) ((((oldVal - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin)
+
+static void daemonize(void)
+{
+	pid_t pid, sid;
+
+	/* already a daemon */
+	if ( getppid() == 1 ) return;
+
+	/* Fork off the parent process */
+	pid = fork();
+	if (pid < 0)
+		exit(1);
+
+	/* If we got a good PID, then we can exit the parent process. */
+	if (pid > 0)
+		exit(0);
+
+	/* At this point we are executing as the child process */
+
+	/* Change the file mode mask */
+	umask(0);
+
+	/* Create a new SID for the child process */
+	sid = setsid();
+	if (sid < 0)
+		exit(1);
+
+	/* Change the current working directory.  This prevents the current
+	directory from being locked; hence not being able to remove it. */
+	if ((chdir("/")) < 0)
+		exit(1);
+
+	/* Redirect standard files to /dev/null */
+	freopen( "/dev/null", "r", stdin);
+	freopen( "/dev/null", "w", stdout);
+	freopen( "/dev/null", "w", stderr);
+}
 
 int main(int argc, char *argv[])
 {
@@ -87,9 +128,6 @@ int main(int argc, char *argv[])
 	regfree(&regex);
 
 
-	/* detach from parent process */
-	setsid();
-
 	fd = open(argv[1], O_RDONLY);
 	if (fd == -1)
 	{
@@ -122,6 +160,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "cannot create port: %s\n", snd_strerror(port));
 		return 1;
 	}
+
+	/* now that startup was sucessful, become a daemon */
+	daemonize();
+
 	snd_seq_ev_clear(&ev);
 	snd_seq_ev_set_source(&ev, port);
 	snd_seq_ev_set_subs(&ev);
