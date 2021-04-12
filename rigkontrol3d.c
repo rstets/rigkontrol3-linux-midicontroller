@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* now that startup was sucessful, become a daemon */
-	daemonize();
+	// daemonize();
 
 	snd_seq_ev_clear(&ev);
 	snd_seq_ev_set_source(&ev, port);
