@@ -30,7 +30,7 @@
 
 #define CLIENT_NAME "RigKontrol3"
 #define PORT_NAME   "Events"
-#define CHANNEL 0
+#define CHANNEL 15
 
 /* Buttons output MIDI notes */
 #define BUTTON_1 1
