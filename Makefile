@@ -10,10 +10,12 @@ all:
 install:
 	install -g root -o root -m 644 ./$(RULES) $(RULES_DIR)/$(RULES)
 	install -g root -o root -m 755 ./$(EXE) $(EXE_DIR)/$(EXE)
+	udevadm control --reload-rules
 
 uninstall:
 	rm -rf $(EXE_DIR)/$(EXE)
 	rm -rf $(RULES_DIR)/$(RULES)
+	udevadm control --reload-rules
 
 clean:
 	rm -rf $(EXE)

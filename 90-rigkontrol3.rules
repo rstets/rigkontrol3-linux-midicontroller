@@ -1,2 +1,2 @@
 # convert RigKontrol3 Input Events to MIDI
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="17cc", ATTRS{idProduct}=="1940", ACTION=="add", GROUP="audio", SUBSYSTEM=="input", ENV{DEVNAME}!="/dev/input/event?", RUN+="/usr/local/bin/rigkontrol3d $env{DEVNAME}", MODE=0666
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="17cc", ATTRS{idProduct}=="1940", ACTION=="add", GROUP="audio", SUBSYSTEM=="input", ENV{DEVNAME}=="/dev/input/event?", RUN+="/usr/local/bin/rigkontrol3d $env{DEVNAME}", MODE=0666
