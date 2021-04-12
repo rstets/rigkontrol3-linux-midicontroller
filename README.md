@@ -1,6 +1,10 @@
+# NI Rig Kontrol 3 MIDI Controller for Linux
 
-ORIGINAL AUTHOR: Xendarboh <xendarboh@gmail.com>
-SOURCE: https://code.google.com/p/rigkontrol3-linux-midicontroller/
+Converts input events from RK3 footswitches to MIDI notes (and to MIDI CC for expression pedal).
+
+
+- ORIGINAL AUTHOR: Xendarboh <xendarboh@gmail.com>
+- ORIGINAL SOURCE: https://code.google.com/p/rigkontrol3-linux-midicontroller/
 
 ### INSTALLATION
 
@@ -22,3 +26,6 @@ sudo make install
 
 - Changed midi port from 1 to 16
 - Updated udev rules to work on rpi os
+
+
+/usr/local/bin/rigkontrol3d $env{DEVNAME}
