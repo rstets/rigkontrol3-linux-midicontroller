@@ -1,0 +1,10 @@
+[Unit]
+Description=RigKontrol 3 Input to MIDI service
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/rigkontrol3d %I &> /var/log/rigkontrol3d.log
+
+[Install]
+WantedBy=multi-user.target
